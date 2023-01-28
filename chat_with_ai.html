@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Chat With AI</title>
+  <style>
+    table {
+        table-layout: fixed;
+        width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <select id="voice-select" />
+  <input id="voice-test" type="button" value="試聴" />
+  <div id="working_root"></div>
+  <input id="recpause_button" type="button" value="" />
+</body>
+<script src="js/speech_synthesiser.js" charset="utf-8"></script>
+<script src="js/chat_with_chatgpt.js" charset="utf-8"></script>
+<script src="js/speech_recognizer.js" charset="utf-8"></script>
+<script>
+
+  let ss = new SpeechSynthesiser('voice-select');  //
+  let ai = new ChatWithChatGPT('working_root', 'recpause_button', (text) => {
+      ss.speak(text);
+  });
+  document.querySelector('#voice-select').addEventListener('change', (ev) => {
+    ss.setVoice(ev.target.value);
+  });
+  document.querySelector('#voice-test').addEventListener('click', () => {
+    ss.setVoice(document.querySelector('#voice-select').value);
+    ss.speak("Hello, world!");
+  });
+
+</script>
+
+</html>

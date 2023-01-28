@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Icon 2 English</title>
+    <link rel="stylesheet" type="text/css" href="css/flickable_icons_translater.css" />
+</head>
+<body>
+    <select id="voice-select1" />
+    <input id="voice-test1" type="button" value="視聴" />
+    <div id="working_root1" class="tray"></div>
+</body>
+<script src="js/speech_synthesiser.js" charset="utf-8_jis"></script>
+<script src="js/words_reorderer.js" charset="utf-8"></script>
+<script src="js/flickable_icons_translater.js" charset="utf-8"></script>
+<script>
+    document.oncontextmenu = () => {  // これがないとタッチの長押しでコンテキストメニューが出てしまう。
+        return false;
+    };
+    let ss1 = new SpeechSynthesiser('voice-select1');
+    let it1 = new FlickableIconsTranslater('working_root1',
+        (text) => {
+            ss1.speak(text);
+        });
+    document.querySelector('#voice-select1').addEventListener('change', (ev) => {
+        ss1.setVoice(ev.target.value);
+    });
+    document.querySelector('#voice-test1').addEventListener('click', () => {
+        ss1.setVoice(document.querySelector('#voice-select1').value);
+        ss1.speak("Hello, world!");
+    });
+</script>
+</html>

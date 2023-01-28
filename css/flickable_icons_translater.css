@@ -1,0 +1,46 @@
+.holding {
+    opacity: .5;
+    z-index: 1000;
+}
+
+.statemenmt_tray {
+    background-color: #eeffee;
+    background-image: url("../img/bg.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 100px;
+}
+
+.words_tray {
+    background-color: #ebebeb;
+    height: 350px;
+}
+
+.draggable_box {
+    background-color: rgb(253, 220, 225);
+    position: absolute;
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.draggable_img {
+    position: relative;
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.expanded {
+    z-index: 1000;
+}
+
+.parent {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: space-around;
+}
+
+.child {
+    width: 80px;
+}
