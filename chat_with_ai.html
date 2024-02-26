@@ -6,8 +6,12 @@
   <title>Chat With AI</title>
   <style>
     table {
-        table-layout: fixed;
-        width: 100%;
+      table-layout: fixed;
+      width: 100%;
+    }
+    .rec_pause{
+      background-color: lightblue;
+      color: blue;
     }
   </style>
 </head>
@@ -15,18 +19,46 @@
 <body>
   <select id="voice-select" />
   <input id="voice-test" type="button" value="試聴" />
-  <div id="working_root"></div>
   <input id="recpause_button" type="button" value="" />
+  <span id="rec_status" class="rec_pause"></span>
+  <div id="working_root"></div>
 </body>
 <script src="js/speech_synthesiser.js" charset="utf-8"></script>
 <script src="js/chat_with_chatgpt.js" charset="utf-8"></script>
 <script src="js/speech_recognizer.js" charset="utf-8"></script>
+<script src="js/api_key.js" charset="utf-8"></script>
 <script>
 
-  let ss = new SpeechSynthesiser('voice-select');  //
-  let ai = new ChatWithChatGPT('working_root', 'recpause_button', (text) => {
-      ss.speak(text);
+  let ss = new SpeechSynthesiser(document.querySelector('#voice-select'));
+  async function speak_during_rec_pause(content) {
+    document.querySelector('#rec_status').innerHTML = "Pausing";
+    sr.stop();
+    ss.speak(content);
+    for (; ;) {
+      let promise = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (ss.idle()) {
+            resolve(1);
+          } else {
+            resolve(0);
+          }
+        }, 200);
+      });
+      let result = await promise;
+      if (result) {
+        break;
+      }
+    }
+    sr.start();
+    document.querySelector('#rec_status').innerHTML = "";
+  }
+  let ai = new ChatWithChatGPT(ApiKey, document.querySelector('#working_root'), (content) => {
+    speak_during_rec_pause(content);
   });
+  let sr = new SpeechRecognizer(document.querySelector('#recpause_button'), (statement) => {
+    ai.chat(statement);
+  });
+
   document.querySelector('#voice-select').addEventListener('change', (ev) => {
     ss.setVoice(ev.target.value);
   });

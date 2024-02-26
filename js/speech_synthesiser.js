@@ -1,6 +1,6 @@
 class SpeechSynthesiser {
-    constructor(list_id) {
-        this.list_id = list_id;
+    constructor(list_element) {
+        this.list_element = list_element;
         speechSynthesis.addEventListener('voiceschanged', ev => {
             this.updateVoiceSelect();
         });
@@ -10,17 +10,23 @@ class SpeechSynthesiser {
         let voice = speechSynthesis.getVoices().filter(voice => voice.name === name)[0];
         this.voice = voice;
     }
+    cancel() {
+        speechSynthesis.cancel();
+    }
     speak(text) {
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.voice = this.voice;
         speechSynthesis.speak(uttr);
     }
+    idle() {
+        let busy = speechSynthesis.speaking || speechSynthesis.pending;
+        return !busy;
+    }
     updateVoiceSelect() {
         const voices = speechSynthesis.getVoices();
-        let elm = document.querySelector('#' + this.list_id);
-        let name = elm.value;
-        elm.innerHTML = '';
-
+        let voice_list = this.list_element;
+        let name = voice_list.value;
+        voice_list.innerHTML = '';
         let matched_voices = [];
         voices.forEach(v => {
             if (!v.lang.match('en-US')) {
@@ -30,10 +36,10 @@ class SpeechSynthesiser {
             option.value = v.name;
             option.text = `${v.name} (${v.lang});`;
             option.setAttribute('selected', v.default);
-            elm.appendChild(option);
+            voice_list.appendChild(option);
             matched_voices.push(v);
         });
-        let persons = ["Aria", "Ana"];
+        let persons = ["Ana", "Aria"];
         persons.some(person => {
             matched_voices.some(v => {
                 if (v.name.match(person)) {
@@ -47,15 +53,14 @@ class SpeechSynthesiser {
         });
         if (name == "" || name == undefined) {
             name = matched_voices.at(-1).name;
-            console.log("updated name = " + name);
         }
-        for ( let i = 0; i < elm.options.length; i++) {
-            if (elm.options[i].value == name) {
+        for (let i = 0; i < voice_list.options.length; i++) {
+            if (voice_list.options[i].value == name) {
                 console.log("selected = " + name);
-                elm.options[i].selected = true;
+                voice_list.options[i].selected = true;
             }
         }
-        let arg = elm.options[elm.selectedIndex].value;
+        let arg = voice_list.options[voice_list.selectedIndex].value;
         this.setVoice(arg);
     }
 }

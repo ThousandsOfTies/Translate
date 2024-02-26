@@ -1,5 +1,5 @@
 class ChatTable {
-    constructor(working_root_id, cols) {
+    constructor(working_root_element, cols) {
         let CHAT_TABLE_CLASS   = 'chat_table';
         this.cols = cols;
 
@@ -8,12 +8,12 @@ class ChatTable {
             hd += '<th>' + col + '</th>';
         });
         hd += '</tr>';
-        document.querySelector('#' + working_root_id).insertAdjacentHTML('beforeend', '<table class="' + CHAT_TABLE_CLASS + '">' + hd + '</table>');
-        this.elm = document.querySelector('#' + working_root_id + " ." + CHAT_TABLE_CLASS);
+        working_root_element.insertAdjacentHTML('beforeend', '<table class="' + CHAT_TABLE_CLASS + '">' + hd + '</table>');
+        this.chat_table_element = working_root_element.querySelector("." + CHAT_TABLE_CLASS);
     }
 
     appendRow(col, msg) {
-        let r = this.elm.insertRow(-1);
+        let r = this.chat_table_element.insertRow(1);
         this.cols.forEach( (col) => {
             r.insertCell();
         });
@@ -22,17 +22,15 @@ class ChatTable {
 }
 
 class ChatWithChatGPT {
-    constructor(api_key, working_root_id, playpause_button_id, onResponse) {
+    constructor(api_key, working_root_element, onResponse) {
         this.api_key = api_key;
         this.onResponse = onResponse;
-        this.chat_table = new ChatTable(working_root_id, ["Yours", "Others"]);
-        this.ai = new SpeechRecognizer('recpause_button', (text) => {
-            this.chat(text);
-        });
+        this.chat_table = new ChatTable(working_root_element, ["Others", "Yours"]);
+
     }
 
     chat(statement) {
-        this.chat_table.appendRow(0, statement);
+        this.chat_table.appendRow(1, statement);
         fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -51,9 +49,9 @@ class ChatWithChatGPT {
             return res.json();
         })
         .then(eng => {
-            var text = eng.choices[0].message.content
-            this.chat_table.appendRow(1, text);
-            this.onResponse(text);
+            var content = eng.choices[0].message.content
+            this.chat_table.appendRow(0, content);
+            this.onResponse(content);
             return;
         });
     }

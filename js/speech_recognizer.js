@@ -1,9 +1,9 @@
 class SpeechRecognizer {
-    constructor(recpause_btn_id, onResult) {
+    constructor(recpause_btn_element, onResult) {
         this.STOP_TEXT = 'STOP';
         this.REC_TEXT = 'REC';
-        this.recpause_btn_id = recpause_btn_id;
-        document.querySelector('#' + this.recpause_btn_id).value = this.REC_TEXT;
+        this.recpause_btn_element = recpause_btn_element;
+        this.recpause_btn_element.value = this.REC_TEXT;
         this.onResult = onResult;
 
         let SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
@@ -20,26 +20,31 @@ class SpeechRecognizer {
             }
             this.onResult(text);
         });
-        this.stop_from_recpause_btn = false;
+        this.intensional_stop = false;
         this.recognition.addEventListener('start', (ev) => {
-            document.querySelector('#' + this.recpause_btn_id).value = this.STOP_TEXT;
+            this.recpause_btn_element.value = this.STOP_TEXT;
         });
         this.recognition.addEventListener('end', (ev) => {
-            if (this.stop_from_recpause_btn == false) {
+            if (this.intensional_stop == false) {
                 this.recognition.start();
                 return;
             }
-            document.querySelector('#' + this.recpause_btn_id).value = this.REC_TEXT;
+            this.recpause_btn_element.value = this.REC_TEXT;
         });
-        document.querySelector('#' + this.recpause_btn_id).addEventListener('click', (ev) => {
+        this.recpause_btn_element.addEventListener('click', (ev) => {
             if (ev.currentTarget.value == this.STOP_TEXT) {
-                this.stop_from_recpause_btn = true;
                 this.recognition.stop();
             } else if (ev.currentTarget.value == this.REC_TEXT) {
                 this.recognition.start();
             }
         });
-
+    }
+    start(){
+        this.recognition.start();
+    }
+    stop(){
+        this.intensional_stop = true;
+        this.recognition.stop();
     }
 }
 
