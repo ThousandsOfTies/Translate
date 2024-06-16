@@ -158,8 +158,9 @@ class DraggableBox extends HTMLDivElement {
 }
 
 class FlickableIconsTranslater {
-    constructor(working_root_id, speak_func) {
+    constructor(working_root_id, api_key, speak_func) {
         this.working_root_id = working_root_id;
+        this.api_key = api_key;
         this.statemenmt_tray_class = 'statemenmt_tray';
         this.words_tray_class = 'words_tray';
         this.word_class = 'word';
@@ -171,13 +172,13 @@ class FlickableIconsTranslater {
     speakInEng(words) {
         document.querySelector('#' + this.working_root_id + ' .words').textContent = words;
         document.querySelector('#' + this.working_root_id + ' .eng').textContent = '英語化中';
-        fetch('https://script.google.com/macros/s/AKfycbzaYhG3i8Q8G-jp0t5DK04qAe7v11od6WVdcNtkvrR6a58b4CbBSgdWmW4QWZ4kFM3l/exec?translate="' + words + '"&source=ja&target=en')
+        fetch('https://script.google.com/macros/s/' + this.api_key + '/exec?text="' + words + '"&source=ja&target=en')
             .then(res => {
                 return res.json();
             })
             .then(eng => {
-                document.querySelector('#' + this.working_root_id + ' .eng').textContent = eng;
-                this.speak_func(eng);
+                document.querySelector('#' + this.working_root_id + ' .eng').textContent = eng.text;
+                this.speak_func(eng.text);
                 return;
             });
     }
